@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { getSocket } from "./socket";
+import { sfx } from "./sfx";
 import { useGameStore } from "~/store/game-store";
 
 /**
@@ -12,26 +13,47 @@ import { useGameStore } from "~/store/game-store";
  */
 export function useGameSocket() {
   const store = useGameStore();
+  const prevPlayerCount = useRef(0);
 
   useEffect(() => {
     const socket = getSocket();
     if (!socket.connected) socket.connect();
 
-    const onLobby = (p: { players: Parameters<typeof store.setLobby>[0]; hostId: string }) =>
+    const onLobby = (p: {
+      players: Parameters<typeof store.setLobby>[0];
+      hostId: string;
+    }) => {
+      // pop only when someone new arrives, not on every lobby refresh
+      if (p.players.length > prevPlayerCount.current) sfx.play("pop");
+      prevPlayerCount.current = p.players.length;
       useGameStore.getState().setLobby(p.players, p.hostId);
-    const onStarting = () => useGameStore.getState().setPhase("STARTING");
+    };
+    const onStarting = () => {
+      sfx.play("start");
+      useGameStore.getState().setPhase("STARTING");
+    };
     const onQuestion = (p: {
       question: Parameters<typeof store.showQuestion>[0];
       index: number;
       total: number;
       endsAt: number;
-    }) => useGameStore.getState().showQuestion(p.question, p.index, p.total, p.endsAt);
+    }) => {
+      sfx.play("reveal");
+      useGameStore.getState().showQuestion(p.question, p.index, p.total, p.endsAt);
+    };
     const onReveal = (p: {
       correctIndex: number;
       leaderboard: Parameters<typeof store.reveal>[1];
-    }) => useGameStore.getState().reveal(p.correctIndex, p.leaderboard);
-    const onOver = (p: { leaderboard: Parameters<typeof store.gameOver>[0] }) =>
+    }) => {
+      const picked = useGameStore.getState().selectedChoice;
+      if (picked === p.correctIndex) sfx.play("correct");
+      else if (picked !== null) sfx.play("wrong");
+      useGameStore.getState().reveal(p.correctIndex, p.leaderboard);
+    };
+    const onOver = (p: { leaderboard: Parameters<typeof store.gameOver>[0] }) => {
+      sfx.play("gameover");
       useGameStore.getState().gameOver(p.leaderboard);
+    };
 
     socket.on("lobby:update", onLobby);
     socket.on("game:starting", onStarting);
@@ -51,6 +73,7 @@ export function useGameSocket() {
   const host = useCallback(
     (hostName: string) =>
       new Promise<string>((resolve) => {
+        sfx.resume(); // unlock audio on this user gesture
         const socket = getSocket();
         if (!socket.connected) socket.connect();
         socket.emit("host:create", { hostName }, ({ gameCode }) => {
@@ -66,6 +89,7 @@ export function useGameSocket() {
   const join = useCallback(
     (gameCode: string, name: string) =>
       new Promise<{ ok: boolean; error?: string }>((resolve) => {
+        sfx.resume(); // unlock audio on this user gesture
         const socket = getSocket();
         if (!socket.connected) socket.connect();
         socket.emit("lobby:join", { gameCode, name }, (res) => {
@@ -83,6 +107,7 @@ export function useGameSocket() {
   const start = useCallback(() => getSocket().emit("game:start"), []);
 
   const answer = useCallback((questionId: string, choiceIndex: number) => {
+    sfx.play("click");
     useGameStore.getState().selectChoice(choiceIndex);
     getSocket().emit("answer:submit", {
       questionId,

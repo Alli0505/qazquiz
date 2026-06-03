@@ -1,0 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { sfx } from "~/lib/sfx";
+
+export function SoundToggle() {
+  const [muted, setMuted] = useState(false);
+  // sync from persisted state after mount (avoids hydration mismatch)
+  useEffect(() => setMuted(sfx.isMuted()), []);
+
+  return (
+    <button
+      type="button"
+      aria-label={muted ? "Unmute sounds" : "Mute sounds"}
+      title={muted ? "Unmute" : "Mute"}
+      onClick={() => {
+        const next = sfx.toggleMuted();
+        setMuted(next);
+        if (!next) sfx.play("pop");
+      }}
+      className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-lg shadow-md backdrop-blur transition-transform hover:scale-110 dark:bg-zinc-800/70"
+    >
+      {muted ? "🔇" : "🔊"}
+    </button>
+  );
+}

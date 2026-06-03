@@ -4,6 +4,7 @@ import { Button } from "@qazquiz/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+import { sfx } from "~/lib/sfx";
 import { useGameSocket } from "~/lib/use-game";
 import { useGameStore } from "~/store/game-store";
 
@@ -94,7 +95,16 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
 function Starting() {
   const [n, setN] = useState(3);
   useEffect(() => {
-    const id = setInterval(() => setN((v) => Math.max(0, v - 1)), 1000);
+    sfx.play("tick");
+    const id = setInterval(
+      () =>
+        setN((v) => {
+          const next = Math.max(0, v - 1);
+          sfx.play(next === 0 ? "reveal" : "tick");
+          return next;
+        }),
+      1000,
+    );
     return () => clearInterval(id);
   }, []);
   return (
