@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { AnimatedBackground } from "~/components/animated-background";
 import { HomeButton } from "~/components/home-button";
+import { LanguageToggle } from "~/components/language-toggle";
 import { SoundToggle } from "~/components/sound-toggle";
 import { TRPCReactProvider } from "~/trpc/react";
 import "./globals.css";
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <AnimatedBackground />
         <HomeButton />
+        <LanguageToggle />
         <SoundToggle />
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>

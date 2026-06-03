@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 
+import { useI18n } from "~/i18n";
 import { getSocket } from "~/lib/socket";
 import { sfx } from "~/lib/sfx";
 import { useGameStore } from "~/store/game-store";
@@ -9,6 +10,7 @@ import { useGameStore } from "~/store/game-store";
 export function HomeButton() {
   const pathname = usePathname();
   const router = useRouter();
+  const { m } = useI18n();
 
   // No need for a "home" button on the home page.
   if (pathname === "/") return null;
@@ -16,8 +18,8 @@ export function HomeButton() {
   return (
     <button
       type="button"
-      aria-label="Back to home"
-      title="Home"
+      aria-label={m.common.home}
+      title={m.common.home}
       onClick={() => {
         sfx.play("click");
         // Leave any active game and clear local state before navigating.

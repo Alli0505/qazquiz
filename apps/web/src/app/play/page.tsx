@@ -4,10 +4,12 @@ import { Button } from "@qazquiz/ui";
 import { useState } from "react";
 
 import { GameScreen } from "~/components/game-screen";
+import { useI18n } from "~/i18n";
 import { useGameSocket } from "~/lib/use-game";
 import { useGameStore } from "~/store/game-store";
 
 export default function PlayPage() {
+  const { m } = useI18n();
   const actions = useGameSocket();
   const gameCode = useGameStore((s) => s.gameCode);
   const [code, setCode] = useState("");
@@ -19,7 +21,7 @@ export default function PlayPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-6">
-      <h1 className="text-center text-3xl font-black">Join a game</h1>
+      <h1 className="text-center text-3xl font-black">{m.play.title}</h1>
       <form
         className="space-y-4"
         onSubmit={async (e) => {
@@ -29,21 +31,21 @@ export default function PlayPage() {
           setError(null);
           const res = await actions.join(code.trim(), name.trim());
           setBusy(false);
-          if (!res.ok) setError(res.error ?? "Could not join");
+          if (!res.ok) setError(res.error ?? m.play.error);
         }}
       >
         <input
           autoFocus
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          placeholder="Game code"
+          placeholder={m.play.codePlaceholder}
           maxLength={5}
           className="w-full rounded-xl border border-zinc-300 bg-transparent px-4 py-3 text-center font-mono text-2xl tracking-[0.3em] outline-none focus:border-indigo-500 dark:border-zinc-700"
         />
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
+          placeholder={m.play.namePlaceholder}
           maxLength={24}
           className="w-full rounded-xl border border-zinc-300 bg-transparent px-4 py-3 outline-none focus:border-indigo-500 dark:border-zinc-700"
         />
@@ -53,7 +55,7 @@ export default function PlayPage() {
           className="w-full"
           disabled={busy || !code.trim() || !name.trim()}
         >
-          {busy ? "Joining…" : "Join"}
+          {busy ? m.play.joining : m.play.join}
         </Button>
       </form>
     </main>

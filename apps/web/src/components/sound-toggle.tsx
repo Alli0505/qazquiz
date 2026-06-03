@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 
+import { useI18n } from "~/i18n";
 import { sfx } from "~/lib/sfx";
 
 export function SoundToggle() {
+  const { m } = useI18n();
   const [muted, setMuted] = useState(false);
   // sync from persisted state after mount (avoids hydration mismatch)
   useEffect(() => setMuted(sfx.isMuted()), []);
@@ -12,8 +14,8 @@ export function SoundToggle() {
   return (
     <button
       type="button"
-      aria-label={muted ? "Unmute sounds" : "Mute sounds"}
-      title={muted ? "Unmute" : "Mute"}
+      aria-label={muted ? m.common.unmute : m.common.mute}
+      title={muted ? m.common.unmute : m.common.mute}
       onClick={() => {
         const next = sfx.toggleMuted();
         setMuted(next);

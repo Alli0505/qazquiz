@@ -4,6 +4,7 @@ import { Button } from "@qazquiz/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+import { useI18n } from "~/i18n";
 import { sfx } from "~/lib/sfx";
 import { useGameSocket } from "~/lib/use-game";
 import { useGameStore } from "~/store/game-store";
@@ -48,12 +49,13 @@ function Fade({ children }: { children: React.ReactNode }) {
 
 function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
   const { gameCode, players, isHost } = useGameStore();
+  const { m, t } = useI18n();
   return (
     <Fade>
       <div className="space-y-8 text-center">
         <div>
           <p className="text-sm uppercase tracking-widest text-zinc-500">
-            Join code
+            {m.lobby.joinCode}
           </p>
           <p className="font-mono text-6xl font-black tracking-[0.2em] text-indigo-500">
             {gameCode}
@@ -62,7 +64,12 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
 
         <div>
           <p className="mb-3 text-sm text-zinc-500">
-            {players.length} player{players.length === 1 ? "" : "s"} in lobby
+            {t(
+              players.length === 1
+                ? m.lobby.players_one
+                : m.lobby.players_other,
+              { n: players.length },
+            )}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {players.map((p) => (
@@ -80,12 +87,10 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
 
         {isHost ? (
           <Button onClick={actions.start} disabled={players.length === 0}>
-            Start game
+            {m.lobby.start}
           </Button>
         ) : (
-          <p className="animate-pulse text-zinc-500">
-            Waiting for the host to start…
-          </p>
+          <p className="animate-pulse text-zinc-500">{m.lobby.waiting}</p>
         )}
       </div>
     </Fade>
@@ -93,6 +98,7 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
 }
 
 function Starting() {
+  const { m } = useI18n();
   const [n, setN] = useState(3);
   useEffect(() => {
     sfx.play("tick");
@@ -116,7 +122,7 @@ function Starting() {
           animate={{ scale: 1, opacity: 1 }}
           className="text-8xl font-black text-indigo-500"
         >
-          {n === 0 ? "Go!" : n}
+          {n === 0 ? m.lobby.go : n}
         </motion.p>
       </div>
     </Fade>
@@ -138,6 +144,7 @@ function useCountdown(endsAt: number | null) {
 function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
   const { question, questionIndex, questionTotal, endsAt, selectedChoice } =
     useGameStore();
+  const { m, t } = useI18n();
   const remaining = useCountdown(endsAt);
   if (!question) return null;
   const secs = Math.ceil(remaining / 1000);
@@ -148,7 +155,10 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
       <div className="space-y-6">
         <div className="flex items-center justify-between text-sm text-zinc-500">
           <span>
-            Question {questionIndex + 1} / {questionTotal}
+            {t(m.game.question, {
+              index: questionIndex + 1,
+              total: questionTotal,
+            })}
           </span>
           <span className="font-mono text-2xl font-bold text-indigo-500">
             {secs}s
@@ -177,7 +187,7 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
         </div>
 
         {locked && (
-          <p className="text-center text-zinc-500">Answer locked in ✓</p>
+          <p className="text-center text-zinc-500">{m.game.locked}</p>
         )}
       </div>
     </Fade>
@@ -186,18 +196,23 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
 
 function RevealView() {
   const { leaderboard, correctIndex, question, myId } = useGameStore();
+  const { m } = useI18n();
   return (
     <Fade>
       <div className="space-y-6 text-center">
         {question && correctIndex !== null && (
           <div className="rounded-2xl bg-emerald-500/15 p-4">
-            <p className="text-sm text-zinc-500">Correct answer</p>
+            <p className="text-sm text-zinc-500">{m.reveal.correct}</p>
             <p className="text-xl font-bold text-emerald-500">
               {question.choices[correctIndex]}
             </p>
           </div>
         )}
-        <Leaderboard myId={myId} entries={leaderboard} title="Standings" />
+        <Leaderboard
+          myId={myId}
+          entries={leaderboard}
+          title={m.reveal.standings}
+        />
       </div>
     </Fade>
   );
@@ -205,18 +220,19 @@ function RevealView() {
 
 function GameOverView() {
   const { leaderboard, myId } = useGameStore();
+  const { m, t } = useI18n();
   const me = leaderboard.find((e) => e.playerId === myId);
   return (
     <Fade>
       <div className="space-y-8 text-center">
         <div>
           <p className="text-sm uppercase tracking-widest text-zinc-500">
-            Game over
+            {m.over.label}
           </p>
-          <h2 className="text-4xl font-black">🏆 Final results</h2>
+          <h2 className="text-4xl font-black">{m.over.title}</h2>
           {me && (
             <p className="mt-2 text-zinc-500">
-              You finished #{me.rank} with {me.score} pts
+              {t(m.over.you, { rank: me.rank, score: me.score })}
             </p>
           )}
         </div>
