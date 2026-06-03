@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@qazquiz/ui/styles.css";
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50;
+}

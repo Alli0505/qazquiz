@@ -1,0 +1,6 @@
+/* Tailwind v4 entrypoint shared across apps. */
+@import "tailwindcss";
+
+@theme {
+  --color-brand: oklch(0.55 0.2 280);
+}

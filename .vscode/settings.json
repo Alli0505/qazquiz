@@ -1,0 +1,25 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // Use the workspace TypeScript so all packages resolve identically.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // Tailwind v4: no tailwind.config.js — point IntelliSense at the CSS
+  // entrypoint and enable completions inside cn()/clsx().
+  "tailwindCSS.experimental.configFile": "apps/web/src/app/globals.css",
+  "tailwindCSS.classFunctions": ["cn", "clsx"],
+
+  "files.exclude": {
+    "**/.turbo": true,
+    "**/.next": true,
+    "**/dist": true
+  },
+  "search.exclude": {
+    "**/pnpm-lock.yaml": true
+  }
+}
