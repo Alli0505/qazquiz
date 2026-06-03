@@ -13,11 +13,18 @@ import { motion } from "framer-motion";
  * `prefers-reduced-motion`.
  */
 
+// Kazakh-inspired joyful palette: flag sky-blue (kök) + gold (the sun),
+// warmed with an ornament red and a bright teal.
+const KZ_BLUE = "#00AFCA";
+const KZ_GOLD = "#FFC93C";
+const KZ_RED = "#E8552D";
+const KZ_TEAL = "#1FB6A6";
+
 const SHAPES = [
-  { sym: "▲", color: "text-rose-500" },
-  { sym: "◆", color: "text-sky-500" },
-  { sym: "●", color: "text-amber-500" },
-  { sym: "■", color: "text-emerald-500" },
+  { sym: "▲", color: KZ_GOLD },
+  { sym: "◆", color: KZ_BLUE },
+  { sym: "●", color: KZ_RED },
+  { sym: "■", color: KZ_TEAL },
 ];
 
 const COUNT = 18;
@@ -44,15 +51,17 @@ export function AnimatedBackground() {
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
-      {/* soft depth glows */}
+      {/* soft depth glows — kök blue + gold */}
       <motion.div
-        className="absolute h-[42vmax] w-[42vmax] rounded-full bg-indigo-500/25 blur-3xl"
+        className="absolute h-[42vmax] w-[42vmax] rounded-full blur-3xl"
+        style={{ backgroundColor: "rgba(0,175,202,0.26)" }}
         initial={{ left: "-12%", top: "-8%" }}
         animate={{ left: ["-12%", "6%", "-12%"], top: ["-8%", "10%", "-8%"] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute h-[38vmax] w-[38vmax] rounded-full bg-fuchsia-500/25 blur-3xl"
+        className="absolute h-[38vmax] w-[38vmax] rounded-full blur-3xl"
+        style={{ backgroundColor: "rgba(255,201,60,0.22)" }}
         initial={{ right: "-10%", bottom: "-10%" }}
         animate={{
           right: ["-10%", "8%", "-10%"],
@@ -66,8 +75,13 @@ export function AnimatedBackground() {
         {FLOATERS.map((f, i) => (
           <motion.span
             key={i}
-            className={`absolute select-none font-black ${f.color} drop-shadow-md`}
-            style={{ left: `${f.left}%`, top: "100%", fontSize: f.size }}
+            className="absolute select-none font-black drop-shadow-md"
+            style={{
+              left: `${f.left}%`,
+              top: "100%",
+              fontSize: f.size,
+              color: f.color,
+            }}
             initial={{ y: "0vh", opacity: 0 }}
             animate={{
               y: ["0vh", "-120vh"],
