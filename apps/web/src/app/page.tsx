@@ -13,7 +13,9 @@ export default function HomePage() {
         <h1 className="bg-gradient-to-r from-indigo-500 to-fuchsia-500 bg-clip-text text-6xl font-black tracking-tight text-transparent">
           QazQuiz
         </h1>
-        <p className="text-lg text-zinc-500">{m.home.subtitle}</p>
+        <p className="text-lg font-medium text-zinc-700 [text-shadow:0_1px_8px_rgba(255,255,255,0.6)] dark:text-zinc-100 dark:[text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
+          {m.home.subtitle}
+        </p>
       </div>
 
       <div className="flex gap-3">
@@ -27,7 +29,7 @@ export default function HomePage() {
 
       <Link
         href="/leaderboard"
-        className="text-sm text-indigo-500 underline-offset-4 hover:underline"
+        className="rounded-full bg-white/60 px-4 py-1.5 text-sm font-semibold text-indigo-700 underline-offset-4 backdrop-blur-sm hover:underline dark:bg-black/40 dark:text-indigo-200"
       >
         {m.home.leaderboard}
       </Link>
