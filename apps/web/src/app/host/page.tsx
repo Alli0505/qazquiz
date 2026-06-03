@@ -41,7 +41,9 @@ export default function HostPage() {
           {busy ? m.host.creating : m.host.create}
         </Button>
       </form>
-      <p className="text-center text-sm text-zinc-500">{m.host.hint}</p>
+      <p className="text-center text-sm font-medium text-zinc-700 [text-shadow:0_1px_8px_rgba(255,255,255,0.6)] dark:text-zinc-200 dark:[text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
+        {m.host.hint}
+      </p>
     </main>
   );
 }
