@@ -11,11 +11,20 @@ import { z } from "zod";
 
 // ── Core entities ─────────────────────────────────────────────────────
 
+/**
+ * Localized text: a map of locale code → string (e.g. { en, kz }).
+ * Used for question prompts and answer choices so the client can render
+ * content in the player's chosen language. `en` is treated as the
+ * fallback when a locale is missing.
+ */
+export const localizedStringSchema = z.record(z.string(), z.string());
+export type LocalizedString = z.infer<typeof localizedStringSchema>;
+
 export const questionSchema = z.object({
   id: z.string().uuid(),
   quizId: z.string().uuid(),
-  prompt: z.string().min(1),
-  choices: z.array(z.string().min(1)).min(2).max(4),
+  prompt: localizedStringSchema,
+  choices: z.array(localizedStringSchema).min(2).max(4),
   correctIndex: z.number().int().min(0).max(3),
   /** seconds the question stays open */
   timeLimit: z.number().int().positive().default(20),

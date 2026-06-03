@@ -144,7 +144,7 @@ function useCountdown(endsAt: number | null) {
 function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
   const { question, questionIndex, questionTotal, endsAt, selectedChoice } =
     useGameStore();
-  const { m, t } = useI18n();
+  const { m, t, lx } = useI18n();
   const remaining = useCountdown(endsAt);
   if (!question) return null;
   const secs = Math.ceil(remaining / 1000);
@@ -165,7 +165,9 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
           </span>
         </div>
 
-        <h2 className="text-center text-3xl font-bold">{question.prompt}</h2>
+        <h2 className="text-center text-3xl font-bold">
+          {lx(question.prompt)}
+        </h2>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {question.choices.map((choice, i) => (
@@ -181,7 +183,7 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
               ].join(" ")}
             >
               <span className="text-2xl">{CHOICE_SHAPES[i]}</span>
-              {choice}
+              {lx(choice)}
             </button>
           ))}
         </div>
@@ -196,15 +198,17 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
 
 function RevealView() {
   const { leaderboard, correctIndex, question, myId } = useGameStore();
-  const { m } = useI18n();
+  const { m, lx } = useI18n();
+  const correctChoice =
+    question && correctIndex !== null ? question.choices[correctIndex] : null;
   return (
     <Fade>
       <div className="space-y-6 text-center">
-        {question && correctIndex !== null && (
+        {correctChoice && (
           <div className="rounded-2xl bg-emerald-500/15 p-4">
             <p className="text-sm text-zinc-500">{m.reveal.correct}</p>
             <p className="text-xl font-bold text-emerald-500">
-              {question.choices[correctIndex]}
+              {lx(correctChoice)}
             </p>
           </div>
         )}

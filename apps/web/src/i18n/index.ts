@@ -50,9 +50,23 @@ export function format(
  *   <h1>{m.home.title}</h1>
  *   <p>{t(m.over.you, { rank, score })}</p>
  */
+/** Pick a localized string from a { en, kz, … } map, falling back to en. */
+export function pickLocalized(
+  map: Record<string, string>,
+  locale: Locale,
+): string {
+  return map[locale] ?? map.en ?? Object.values(map)[0] ?? "";
+}
+
 export function useI18n() {
   const locale = useLocaleStore((s) => s.locale);
-  return { locale, m: messages[locale], t: format };
+  return {
+    locale,
+    m: messages[locale],
+    t: format,
+    /** localize a { en, kz } content map using the active locale */
+    lx: (map: Record<string, string>) => pickLocalized(map, locale),
+  };
 }
 
 export { LOCALES, LOCALE_LABELS, type Locale } from "./messages";

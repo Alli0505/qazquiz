@@ -3,12 +3,15 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   smallint,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+
+type LocalizedString = Record<string, string>;
 
 // ── Auth (Better Auth core tables) ────────────────────────────────────
 // Better Auth manages migrations for these, but we declare them so app
@@ -46,8 +49,9 @@ export const questions = pgTable(
       .references(() => quizzes.id, { onDelete: "cascade" })
       .notNull(),
     order: integer("order").notNull(),
-    prompt: text("prompt").notNull(),
-    choices: text("choices").array().notNull(),
+    // localized content: { en, kz, … }
+    prompt: jsonb("prompt").$type<LocalizedString>().notNull(),
+    choices: jsonb("choices").$type<LocalizedString[]>().notNull(),
     correctIndex: smallint("correct_index").notNull(),
     timeLimit: integer("time_limit").default(20).notNull(),
     points: integer("points").default(1000).notNull(),
