@@ -128,9 +128,9 @@ function createGame(code: string, hostId: string, questions: Question[]) {
 io.on("connection", (socket) => {
   let joinedCode: string | null = null;
 
-  socket.on("host:create", async ({ hostName }, ack) => {
+  socket.on("host:create", async ({ hostName, difficulty }, ack) => {
     const code = makeCode();
-    const actor = createGame(code, socket.id, demoQuestions());
+    const actor = createGame(code, socket.id, demoQuestions(difficulty));
     joinedCode = code;
     await socket.join(code);
     actor.send({

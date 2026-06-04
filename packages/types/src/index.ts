@@ -57,6 +57,9 @@ export const gamePhase = z.enum([
 ]);
 export type GamePhase = z.infer<typeof gamePhase>;
 
+export const difficultySchema = z.enum(["easy", "hard"]);
+export type Difficulty = z.infer<typeof difficultySchema>;
+
 // ── Socket.io event contracts ─────────────────────────────────────────
 // Strongly-typed maps consumed by both client and server.
 
@@ -80,7 +83,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   /** Host opens a new room; ack returns the join code. */
   "host:create": (
-    payload: { hostName: string },
+    payload: { hostName: string; difficulty: Difficulty },
     ack: (res: { gameCode: string }) => void,
   ) => void;
   "lobby:join": (

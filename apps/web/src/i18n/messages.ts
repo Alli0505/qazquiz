@@ -26,6 +26,11 @@ const en = {
     create: "Create room",
     creating: "Creating…",
     hint: "You'll get a 5-letter code to share. Demo quiz is preloaded.",
+    difficulty: "Difficulty",
+    easy: "Easy",
+    hard: "Hard",
+    easyHint: "General knowledge · 15s per question",
+    hardHint: "Tough logic & abstract puzzles · 2 min per question",
   },
   play: {
     title: "Join a game",
@@ -85,6 +90,11 @@ const kz: Messages = {
     create: "Бөлме құру",
     creating: "Құрылуда…",
     hint: "Бөлісу үшін 5 әріптік код аласыз. Демо викторина дайын тұр.",
+    difficulty: "Деңгей",
+    easy: "Оңай",
+    hard: "Қиын",
+    easyHint: "Жалпы білім · әр сұраққа 15 сек",
+    hardHint: "Күрделі логика және абстракция · әр сұраққа 2 мин",
   },
   play: {
     title: "Ойынға қосылу",
