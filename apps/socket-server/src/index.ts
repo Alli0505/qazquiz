@@ -17,7 +17,7 @@ import {
   snapshotLeaderboard,
   type GameContext,
 } from "./game-machine";
-import { demoQuestions } from "./questions";
+import { loadQuestions } from "./questions";
 import { getScoreStore } from "./scores";
 
 const PORT = Number(process.env.SOCKET_SERVER_PORT ?? 3001);
@@ -130,7 +130,7 @@ io.on("connection", (socket) => {
 
   socket.on("host:create", async ({ hostName, difficulty }, ack) => {
     const code = makeCode();
-    const actor = createGame(code, socket.id, demoQuestions(difficulty));
+    const actor = createGame(code, socket.id, await loadQuestions(difficulty));
     joinedCode = code;
     await socket.join(code);
     actor.send({

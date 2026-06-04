@@ -63,18 +63,51 @@ leaderboard animates between rounds. Add more tabs for more players.
 
 > First time only: `brew install node && npm i -g pnpm@9` to get the toolchain.
 
+## Questions database (Postgres)
+
+Questions live in Postgres (table `questions`), tagged by `difficulty`
+(`easy`/`hard`) and stored as localized JSON (`{ en, kz }`). A game draws 10
+at random from the matching difficulty bank. If `DATABASE_URL` is unset or the
+DB is unreachable, the socket server **falls back to the in-memory bank**, so
+the zero-config run above still works.
+
+Local dev uses Docker Postgres (via [Colima](https://github.com/abiosoft/colima)
+if you don't have Docker Desktop):
+
+```bash
+# one-time: a Docker engine
+brew install colima docker docker-compose && colima start
+
+docker compose up -d                 # Postgres on :5432 (see docker-compose.yml)
+cp .env.example .env                 # DATABASE_URL points at local Docker
+
+pnpm --filter @qazquiz/db db:migrate # create tables
+pnpm --filter @qazquiz/socket-server db:seed   # load the 39-question bank
+pnpm dev                             # socket server now reads questions from PG
+```
+
+> Colima note: the daemon socket isn't at the default path. If `docker compose`
+> can't connect, prefix commands with
+> `DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"`.
+
+The driver is `postgres.js` (standard TCP), which works against local Postgres
+**and** Neon (use Neon's *pooled* connection string in production — see
+`.env.example`).
+
 ## Going to production (Neon + Redis)
 
 ```bash
-cp .env.example .env                 # fill in Neon + Redis + auth secrets
-pnpm db:generate && pnpm db:migrate  # push the Drizzle schema to Neon
+# DATABASE_URL → Neon pooled URL, then:
+pnpm --filter @qazquiz/db db:migrate
+pnpm --filter @qazquiz/socket-server db:seed
 export REDIS_TCP_URL=redis://…       # socket-server switches to Redis sorted sets
 pnpm dev
 ```
 
 Remaining wiring for prod (marked with `TODO` in the code): Better Auth session
-resolution (`apps/web/src/lib/auth.ts`), loading a host's real quiz from Postgres
-instead of the demo bank, and flushing final scores to Postgres on `game:over`.
+resolution (`apps/web/src/lib/auth.ts`), authored-quiz play (questions with a
+`quiz_id` instead of bank draws), and flushing final scores to Postgres on
+`game:over`.
 
 ## Scripts
 

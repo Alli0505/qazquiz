@@ -4,6 +4,7 @@ import {
   index,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   smallint,
   text,
@@ -12,6 +13,8 @@ import {
 } from "drizzle-orm/pg-core";
 
 type LocalizedString = Record<string, string>;
+
+export const difficultyEnum = pgEnum("difficulty", ["easy", "hard"]);
 
 // ── Auth (Better Auth core tables) ────────────────────────────────────
 // Better Auth manages migrations for these, but we declare them so app
@@ -45,19 +48,32 @@ export const questions = pgTable(
   "questions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    quizId: uuid("quiz_id")
-      .references(() => quizzes.id, { onDelete: "cascade" })
-      .notNull(),
-    order: integer("order").notNull(),
+    /** NULL = standalone bank question; set = belongs to an authored quiz */
+    quizId: uuid("quiz_id").references(() => quizzes.id, {
+      onDelete: "cascade",
+    }),
+    difficulty: difficultyEnum("difficulty").default("easy").notNull(),
+    category: text("category"),
+    /** only meaningful within an authored quiz */
+    order: integer("order"),
     // localized content: { en, kz, … }
     prompt: jsonb("prompt").$type<LocalizedString>().notNull(),
     choices: jsonb("choices").$type<LocalizedString[]>().notNull(),
     correctIndex: smallint("correct_index").notNull(),
-    timeLimit: integer("time_limit").default(20).notNull(),
+    /** optional localized "why this answer is correct" */
+    explanation: jsonb("explanation").$type<LocalizedString>(),
+    timeLimit: integer("time_limit").default(15).notNull(),
     points: integer("points").default(1000).notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => ({
     byQuiz: index("questions_quiz_idx").on(t.quizId),
+    // fast random draw of active bank questions per difficulty
+    byDifficulty: index("questions_difficulty_idx").on(
+      t.difficulty,
+      t.isActive,
+    ),
   }),
 );
 
@@ -67,11 +83,15 @@ export const games = pgTable(
   "games",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    quizId: uuid("quiz_id")
-      .references(() => quizzes.id, { onDelete: "restrict" })
-      .notNull(),
-    hostId: text("host_id")
-      .references(() => users.id, { onDelete: "set null" }),
+    /** NULL for a bank-mode game (uses `difficulty` instead of a quiz) */
+    quizId: uuid("quiz_id").references(() => quizzes.id, {
+      onDelete: "restrict",
+    }),
+    /** set for bank-mode games */
+    difficulty: difficultyEnum("difficulty"),
+    hostId: text("host_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     code: text("code").notNull().unique(), // join code, e.g. "QAZ-7F3K"
     startedAt: timestamp("started_at"),
     endedAt: timestamp("ended_at"),

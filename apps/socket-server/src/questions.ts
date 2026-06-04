@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 
+import { db, questions as questionsTable } from "@qazquiz/db";
 import type { Difficulty, LocalizedString, Question } from "@qazquiz/types";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 /**
  * MVP demo quiz banks. In production these come from Postgres (the
@@ -17,7 +19,7 @@ export const QUESTIONS_PER_GAME = 10;
 const HARD_TIME_LIMIT = 120; // seconds
 const EASY_TIME_LIMIT = 15;
 
-interface RawQuestion {
+export interface RawQuestion {
   prompt: LocalizedString;
   choices: LocalizedString[];
   correctIndex: number;
@@ -25,7 +27,7 @@ interface RawQuestion {
   points?: number;
 }
 
-const EASY_BANK: RawQuestion[] = [
+export const EASY_BANK: RawQuestion[] = [
   // ── General knowledge ──────────────────────────────────────────────
   {
     prompt: {
@@ -280,7 +282,7 @@ const EASY_BANK: RawQuestion[] = [
 ];
 
 // ── HARD: tough logical & abstract puzzles (2 minutes each) ───────────
-const HARD_BANK: RawQuestion[] = [
+export const HARD_BANK: RawQuestion[] = [
   {
     prompt: {
       en: "What comes next: 1, 11, 21, 1211, 111221, ?",
@@ -543,9 +545,14 @@ const HARD_BANK: RawQuestion[] = [
   },
 ];
 
-const BANKS: Record<Difficulty, RawQuestion[]> = {
+export const BANKS: Record<Difficulty, RawQuestion[]> = {
   easy: EASY_BANK,
   hard: HARD_BANK,
+};
+
+export const DEFAULT_TIME_LIMIT: Record<Difficulty, number> = {
+  easy: EASY_TIME_LIMIT,
+  hard: HARD_TIME_LIMIT,
 };
 
 /** In-place Fisher–Yates shuffle on a copy of the input array. */
@@ -564,15 +571,58 @@ export function demoQuestions(
   count = QUESTIONS_PER_GAME,
 ): Question[] {
   const bank = BANKS[difficulty];
-  const defaultTime =
-    difficulty === "hard" ? HARD_TIME_LIMIT : EASY_TIME_LIMIT;
   return shuffled(bank)
     .slice(0, Math.min(count, bank.length))
     .map((q) => ({
       ...q,
       id: randomUUID(),
       quizId: QUIZ_ID,
-      timeLimit: q.timeLimit ?? defaultTime,
+      timeLimit: q.timeLimit ?? DEFAULT_TIME_LIMIT[difficulty],
       points: q.points ?? 1000,
     }));
+}
+
+/**
+ * Load a random set of questions for a game. Prefers Postgres (the bank
+ * questions for the chosen difficulty); falls back to the in-memory bank
+ * if the DB is unreachable or hasn't been seeded yet.
+ */
+export async function loadQuestions(
+  difficulty: Difficulty = "easy",
+  count = QUESTIONS_PER_GAME,
+): Promise<Question[]> {
+  try {
+    const rows = await db
+      .select()
+      .from(questionsTable)
+      .where(
+        and(
+          eq(questionsTable.difficulty, difficulty),
+          eq(questionsTable.isActive, true),
+          isNull(questionsTable.quizId),
+        ),
+      )
+      .orderBy(sql`random()`)
+      .limit(count);
+
+    if (rows.length > 0) {
+      return rows.map((r) => ({
+        id: r.id,
+        quizId: r.quizId ?? QUIZ_ID,
+        prompt: r.prompt,
+        choices: r.choices,
+        correctIndex: r.correctIndex,
+        timeLimit: r.timeLimit,
+        points: r.points,
+      }));
+    }
+    console.warn(
+      `[questions] DB has no ${difficulty} bank questions — using in-memory fallback`,
+    );
+  } catch (err) {
+    console.warn(
+      `[questions] DB load failed (${(err as Error).message}) — using in-memory fallback`,
+    );
+  }
+  return demoQuestions(difficulty, count);
 }
