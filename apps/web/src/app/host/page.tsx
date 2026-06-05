@@ -59,9 +59,9 @@ export default function HostPage() {
                   "rounded-xl px-4 py-3 text-sm font-bold transition-colors",
                   difficulty === d
                     ? d === "hard"
-                      ? "bg-rose-600 text-white"
-                      : "bg-indigo-600 text-white"
-                    : "bg-white/60 text-zinc-700 backdrop-blur-sm hover:bg-white/80 dark:bg-black/30 dark:text-zinc-200",
+                      ? "bg-rose-600 text-white hover:bg-rose-500"
+                      : "bg-indigo-600 text-white hover:bg-indigo-500"
+                    : "bg-white/80 text-zinc-800 backdrop-blur-sm hover:bg-white dark:bg-zinc-800/80 dark:text-zinc-100 dark:hover:bg-zinc-700",
                 ].join(" ")}
               >
                 {d === "hard" ? m.host.hard : m.host.easy}

@@ -30,7 +30,7 @@ export function LanguageToggle() {
             "rounded-full px-3 py-1 text-xs font-bold transition-colors",
             locale === l
               ? "bg-indigo-600 text-white"
-              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100",
+              : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100",
           ].join(" ")}
         >
           {LOCALE_LABELS[l]}

@@ -54,7 +54,7 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
     <Fade>
       <div className="space-y-8 text-center">
         <div>
-          <p className="text-sm uppercase tracking-widest text-zinc-500">
+          <p className="text-sm uppercase tracking-widest text-soft">
             {m.lobby.joinCode}
           </p>
           <p className="font-mono text-6xl font-black tracking-[0.2em] text-indigo-500">
@@ -63,7 +63,7 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
         </div>
 
         <div>
-          <p className="mb-3 text-sm text-zinc-500">
+          <p className="mb-3 text-sm text-soft">
             {t(
               players.length === 1
                 ? m.lobby.players_one
@@ -90,7 +90,7 @@ function Lobby({ actions }: { actions: ReturnType<typeof useGameSocket> }) {
             {m.lobby.start}
           </Button>
         ) : (
-          <p className="animate-pulse text-zinc-500">{m.lobby.waiting}</p>
+          <p className="animate-pulse text-soft">{m.lobby.waiting}</p>
         )}
       </div>
     </Fade>
@@ -153,7 +153,7 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
   return (
     <Fade>
       <div className="space-y-6">
-        <div className="flex items-center justify-between text-sm text-zinc-500">
+        <div className="flex items-center justify-between text-sm text-soft">
           <span>
             {t(m.game.question, {
               index: questionIndex + 1,
@@ -189,7 +189,7 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
         </div>
 
         {locked && (
-          <p className="text-center text-zinc-500">{m.game.locked}</p>
+          <p className="text-center text-soft">{m.game.locked}</p>
         )}
       </div>
     </Fade>
@@ -206,7 +206,7 @@ function RevealView() {
       <div className="space-y-6 text-center">
         {correctChoice && (
           <div className="rounded-2xl bg-emerald-500/15 p-4">
-            <p className="text-sm text-zinc-500">{m.reveal.correct}</p>
+            <p className="text-sm text-soft">{m.reveal.correct}</p>
             <p className="text-xl font-bold text-emerald-500">
               {lx(correctChoice)}
             </p>
@@ -230,12 +230,12 @@ function GameOverView() {
     <Fade>
       <div className="space-y-8 text-center">
         <div>
-          <p className="text-sm uppercase tracking-widest text-zinc-500">
+          <p className="text-sm uppercase tracking-widest text-soft">
             {m.over.label}
           </p>
           <h2 className="text-4xl font-black">{m.over.title}</h2>
           {me && (
-            <p className="mt-2 text-zinc-500">
+            <p className="mt-2 text-soft">
               {t(m.over.you, { rank: me.rank, score: me.score })}
             </p>
           )}
@@ -259,7 +259,7 @@ function Leaderboard({
   return (
     <div className="mx-auto max-w-md space-y-2">
       {title && (
-        <p className="text-sm uppercase tracking-widest text-zinc-500">
+        <p className="text-sm uppercase tracking-widest text-soft">
           {title}
         </p>
       )}
