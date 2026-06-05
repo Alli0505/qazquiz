@@ -1,4 +1,4 @@
-CREATE TYPE "public"."difficulty" AS ENUM('easy', 'hard');--> statement-breakpoint
+CREATE TYPE "public"."difficulty" AS ENUM('easy', 'medium', 'hard');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "game_results" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"game_id" uuid NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS "questions" (
 	"correct_index" smallint NOT NULL,
 	"explanation" jsonb,
 	"time_limit" integer DEFAULT 15 NOT NULL,
-	"points" integer DEFAULT 1000 NOT NULL,
+	"points" integer DEFAULT 100 NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );

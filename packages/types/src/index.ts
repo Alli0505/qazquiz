@@ -57,7 +57,7 @@ export const gamePhase = z.enum([
 ]);
 export type GamePhase = z.infer<typeof gamePhase>;
 
-export const difficultySchema = z.enum(["easy", "hard"]);
+export const difficultySchema = z.enum(["easy", "medium", "hard"]);
 export type Difficulty = z.infer<typeof difficultySchema>;
 
 // ── Socket.io event contracts ─────────────────────────────────────────

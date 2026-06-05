@@ -10,11 +10,17 @@ import { client, db, questions } from "@qazquiz/db";
 import type { Difficulty } from "@qazquiz/types";
 import { isNull } from "drizzle-orm";
 
-import { DEFAULT_TIME_LIMIT, EASY_BANK, HARD_BANK } from "./questions";
+import {
+  DEFAULT_TIME_LIMIT,
+  EASY_BANK,
+  HARD_BANK,
+  MEDIUM_BANK,
+} from "./questions";
 
 async function seed() {
   const banks: Array<{ difficulty: Difficulty; bank: typeof EASY_BANK }> = [
     { difficulty: "easy", bank: EASY_BANK },
+    { difficulty: "medium", bank: MEDIUM_BANK },
     { difficulty: "hard", bank: HARD_BANK },
   ];
 
@@ -38,7 +44,7 @@ async function seed() {
 
   console.log(
     `✅ Seeded ${rows.length} bank questions ` +
-      `(${EASY_BANK.length} easy, ${HARD_BANK.length} hard)`,
+      `(${EASY_BANK.length} easy, ${MEDIUM_BANK.length} medium, ${HARD_BANK.length} hard)`,
   );
   await client.end();
 }

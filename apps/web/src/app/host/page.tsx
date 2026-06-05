@@ -19,8 +19,23 @@ export default function HostPage() {
 
   if (gameCode) return <GameScreen actions={actions} />;
 
-  const difficultyHint =
-    difficulty === "hard" ? m.host.hardHint : m.host.easyHint;
+  const difficultyHint = {
+    easy: m.host.easyHint,
+    medium: m.host.mediumHint,
+    hard: m.host.hardHint,
+  }[difficulty];
+
+  const difficultyLabel: Record<Difficulty, string> = {
+    easy: m.host.easy,
+    medium: m.host.medium,
+    hard: m.host.hard,
+  };
+
+  const activeClass: Record<Difficulty, string> = {
+    easy: "bg-indigo-600 text-white hover:bg-indigo-500",
+    medium: "bg-amber-500 text-white hover:bg-amber-400",
+    hard: "bg-rose-600 text-white hover:bg-rose-500",
+  };
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-6">
@@ -48,23 +63,21 @@ export default function HostPage() {
           <p className="mb-2 text-center text-sm font-semibold text-zinc-700 [text-shadow:0_1px_8px_rgba(255,255,255,0.6)] dark:text-zinc-200 dark:[text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
             {m.host.difficulty}
           </p>
-          <div className="grid grid-cols-2 gap-2">
-            {(["easy", "hard"] as const).map((d) => (
+          <div className="grid grid-cols-3 gap-2">
+            {(["easy", "medium", "hard"] as const).map((d) => (
               <button
                 key={d}
                 type="button"
                 aria-pressed={difficulty === d}
                 onClick={() => setDifficulty(d)}
                 className={[
-                  "rounded-xl px-4 py-3 text-sm font-bold transition-colors",
+                  "rounded-xl px-3 py-3 text-sm font-bold transition-colors",
                   difficulty === d
-                    ? d === "hard"
-                      ? "bg-rose-600 text-white hover:bg-rose-500"
-                      : "bg-indigo-600 text-white hover:bg-indigo-500"
+                    ? activeClass[d]
                     : "bg-white/80 text-zinc-800 backdrop-blur-sm hover:bg-white dark:bg-zinc-800/80 dark:text-zinc-100 dark:hover:bg-zinc-700",
                 ].join(" ")}
               >
-                {d === "hard" ? m.host.hard : m.host.easy}
+                {difficultyLabel[d]}
               </button>
             ))}
           </div>

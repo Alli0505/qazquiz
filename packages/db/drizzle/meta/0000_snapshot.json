@@ -1,5 +1,5 @@
 {
-  "id": "ffacf762-2c21-43fc-a716-741d243abddc",
+  "id": "05475d2b-1700-4200-b048-200dcb835827",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -285,7 +285,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": 1000
+          "default": 100
         },
         "is_active": {
           "name": "is_active",
@@ -506,6 +506,7 @@
       "schema": "public",
       "values": [
         "easy",
+        "medium",
         "hard"
       ]
     }

@@ -11,13 +11,15 @@ import { and, eq, isNull, sql } from "drizzle-orm";
  *
  * Each game draws a random subset (QUESTIONS_PER_GAME) from the bank that
  * matches the chosen difficulty:
- *  - easy: general knowledge + light logic, 15s per question
- *  - hard: tough logical / abstract puzzles, 120s (2 min) per question
+ *  - easy:   general knowledge + light logic, 15s per question
+ *  - medium: tough logical / abstract puzzles, 60s (1 min) per question
+ *  - hard:   story-based critical-thinking puzzles, 300s (5 min) per question
  */
 const QUIZ_ID = "00000000-0000-0000-0000-000000000001";
 export const QUESTIONS_PER_GAME = 10;
-const HARD_TIME_LIMIT = 120; // seconds
 const EASY_TIME_LIMIT = 15;
+const MEDIUM_TIME_LIMIT = 60;
+const HARD_TIME_LIMIT = 300;
 
 export interface RawQuestion {
   prompt: LocalizedString;
@@ -281,8 +283,8 @@ export const EASY_BANK: RawQuestion[] = [
   },
 ];
 
-// ── HARD: tough logical & abstract puzzles (2 minutes each) ───────────
-export const HARD_BANK: RawQuestion[] = [
+// ── MEDIUM: tough logical & abstract puzzles (1 minute each) ──────────
+export const MEDIUM_BANK: RawQuestion[] = [
   {
     prompt: {
       en: "What comes next: 1, 11, 21, 1211, 111221, ?",
@@ -545,13 +547,321 @@ export const HARD_BANK: RawQuestion[] = [
   },
 ];
 
+// ── HARD: story-based critical-thinking puzzles (5 minutes each) ──────
+export const HARD_BANK: RawQuestion[] = [
+  {
+    prompt: {
+      en: "On an island, knights always tell the truth and knaves always lie. You meet A and B. A says: 'We are both knaves.' What are A and B?",
+      kz: "Аралда рыцарьлар әрқашан шындықты, ал жалғаншылар әрқашан өтірік айтады. Сіз A мен B-ні кездестірдіңіз. A: «Екеуміз де жалғаншымыз» дейді. A мен B кім?",
+    },
+    choices: [
+      { en: "A is a knight, B is a knave", kz: "A — рыцарь, B — жалғаншы" },
+      { en: "A is a knave, B is a knight", kz: "A — жалғаншы, B — рыцарь" },
+      { en: "Both are knaves", kz: "Екеуі де жалғаншы" },
+      { en: "Both are knights", kz: "Екеуі де рыцарь" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "Three boxes are labeled 'Apples', 'Oranges', and 'Apples & Oranges'. Every label is wrong. Drawing one fruit from a single box, which box lets you correctly relabel all three?",
+      kz: "Үш жәшік «Алма», «Апельсин» және «Алма мен Апельсин» деп белгіленген. Барлық белгі қате. Бір жәшіктен бір жеміс алып, үшеуін де дұрыс белгілеу үшін қай жәшіктен алу керек?",
+    },
+    choices: [
+      { en: "The one labeled 'Apples'", kz: "«Алма» деп белгіленгені" },
+      { en: "The one labeled 'Oranges'", kz: "«Апельсин» деп белгіленгені" },
+      {
+        en: "The one labeled 'Apples & Oranges'",
+        kz: "«Алма мен Апельсин» деп белгіленгені",
+      },
+      { en: "Any box works", kz: "Кез келген жәшік жарайды" },
+    ],
+    correctIndex: 2,
+  },
+  {
+    prompt: {
+      en: "A disease affects 1 in 10,000 people. A test is 99% accurate. You test positive. Roughly what is the probability you actually have the disease?",
+      kz: "Ауру 10 000 адамның 1-іне әсер етеді. Тест 99% дәл. Нәтижеңіз оң шықты. Сізде шынымен ауру болу ықтималдығы шамамен қанша?",
+    },
+    choices: [
+      { en: "About 99%", kz: "Шамамен 99%" },
+      { en: "About 90%", kz: "Шамамен 90%" },
+      { en: "About 50%", kz: "Шамамен 50%" },
+      { en: "About 1%", kz: "Шамамен 1%" },
+    ],
+    correctIndex: 3,
+  },
+  {
+    prompt: {
+      en: "Outside a sealed room are 3 switches; one turns on a bulb inside. You may flip switches freely but can enter the room only once. How do you find the right switch?",
+      kz: "Жабық бөлменің сыртында 3 қосқыш бар; біреуі іштегі шамды қосады. Қосқыштарды қалағаныңызша баса аласыз, бірақ бөлмеге тек бір рет кіресіз. Дұрыс қосқышты қалай табасыз?",
+    },
+    choices: [
+      { en: "It is impossible with one entry", kz: "Бір кіріспен мүмкін емес" },
+      {
+        en: "Turn one on a while then off; turn another on; enter — use the bulb's light and warmth",
+        kz: "Біреуін біраз қосып өшіріңіз; екіншісін қосыңыз; кіріп — шамның жарығы мен жылуын пайдаланыңыз",
+      },
+      { en: "Switch all three on, then enter", kz: "Үшеуін де қосып, кіріңіз" },
+      { en: "Ask someone inside", kz: "Іштегі біреуден сұраңыз" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "In a room of just 23 people, the probability that at least two share the same birthday is closest to:",
+      kz: "Бар болғаны 23 адам бар бөлмеде кемінде екеуінің туған күні бірдей болу ықтималдығы неге жақын?",
+    },
+    choices: [
+      { en: "About 6%", kz: "Шамамен 6%" },
+      { en: "About 23%", kz: "Шамамен 23%" },
+      { en: "About 50%", kz: "Шамамен 50%" },
+      { en: "About 99%", kz: "Шамамен 99%" },
+    ],
+    correctIndex: 2,
+  },
+  {
+    prompt: {
+      en: "A man pushes his car up to a hotel and immediately announces he is bankrupt. Why?",
+      kz: "Бір адам көлігін қонақүйге дейін итеріп әкеліп, бірден банкрот екенін айтады. Неліктен?",
+    },
+    choices: [
+      { en: "His car broke down", kz: "Көлігі бұзылған" },
+      { en: "He is playing Monopoly", kz: "Ол «Монополия» ойнап жатыр" },
+      { en: "He lost his wallet", kz: "Әмиянын жоғалтқан" },
+      { en: "The hotel is too expensive", kz: "Қонақүй тым қымбат" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "You have 9 identical-looking coins; exactly one is slightly heavier. Using only a balance scale, what is the minimum number of weighings that guarantees finding it?",
+      kz: "Сізде 9 бірдей көрінетін монета бар; нақ біреуі сәл ауырлау. Тек теңгерме таразымен оны табуға кепілдік беретін ең аз өлшеу саны қанша?",
+    },
+    choices: [
+      { en: "1", kz: "1" },
+      { en: "2", kz: "2" },
+      { en: "3", kz: "3" },
+      { en: "4", kz: "4" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "Two fathers and two sons go fishing. Each catches exactly one fish, yet only three fish are caught in total. How?",
+      kz: "Екі әке мен екі ұл балық аулауға барды. Әрқайсысы нақ бір балық ұстады, бірақ бәрі болып үш-ақ балық ұсталды. Қалай?",
+    },
+    choices: [
+      { en: "One fish escaped", kz: "Бір балық қашып кетті" },
+      { en: "They miscounted", kz: "Қате санаған" },
+      {
+        en: "They are a grandfather, a father, and a son",
+        kz: "Олар — ата, әке және ұл",
+      },
+      { en: "One of them caught two", kz: "Біреуі екеуін ұстады" },
+    ],
+    correctIndex: 2,
+  },
+  {
+    prompt: {
+      en: "All of Anna's friends speak French. Some people who speak French are teachers. Which statement MUST be true?",
+      kz: "Аннаның барлық достары француз тілінде сөйлейді. Француз тілінде сөйлейтін кейбіреулер — мұғалім. Қай тұжырым МІНДЕТТІ ТҮРДЕ ақиқат?",
+    },
+    choices: [
+      {
+        en: "Some of Anna's friends are teachers",
+        kz: "Аннаның кейбір достары — мұғалім",
+      },
+      {
+        en: "None of Anna's friends are teachers",
+        kz: "Аннаның бірде-бір досы мұғалім емес",
+      },
+      {
+        en: "Nothing certain can be concluded about that",
+        kz: "Бұл туралы нақты қорытынды жасауға болмайды",
+      },
+      {
+        en: "All of Anna's friends are teachers",
+        kz: "Аннаның барлық достары — мұғалім",
+      },
+    ],
+    correctIndex: 2,
+  },
+  {
+    prompt: {
+      en: "A woman shoots her husband, holds him under water for several minutes, then hangs him. An hour later they have dinner together. How?",
+      kz: "Бір әйел күйеуін атып, бірнеше минут су астында ұстайды, сосын іліп қояды. Бір сағаттан соң олар бірге кешкі ас ішеді. Қалай?",
+    },
+    choices: [
+      { en: "She is a photographer", kz: "Ол — фотограф" },
+      { en: "He is a ghost", kz: "Күйеуі — елес" },
+      { en: "It was only a dream", kz: "Бұл жай түс еді" },
+      { en: "He has a twin brother", kz: "Күйеуінің егіз ағасы бар" },
+    ],
+    correctIndex: 0,
+  },
+  {
+    prompt: {
+      en: "You flip a fair coin three times. Given that at least one flip is heads, what is the probability that all three are heads?",
+      kz: "Әділ тиынды үш рет лақтырдыңыз. Кемінде бір рет «бүркіт» түскені белгілі болса, үшеуінің де «бүркіт» болу ықтималдығы қанша?",
+    },
+    choices: [
+      { en: "1/8", kz: "1/8" },
+      { en: "1/7", kz: "1/7" },
+      { en: "1/3", kz: "1/3" },
+      { en: "1/2", kz: "1/2" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "Two doors: one leads to safety, one to death. One guard always lies, the other always tells the truth, but you don't know which is which. You may ask ONE guard ONE yes/no question. Which approach works?",
+      kz: "Екі есік: біреуі — қауіпсіздікке, біреуі — өлімге. Бір күзетші әрқашан өтірік, екіншісі әрқашан шындық айтады, бірақ қайсысы екенін білмейсіз. Бір күзетшіге бір «иә/жоқ» сұрақ қоя аласыз. Қай тәсіл жұмыс істейді?",
+    },
+    choices: [
+      { en: "Ask 'Are you the truth-teller?'", kz: "«Сіз шындық айтушысыз ба?» деп сұраңыз" },
+      {
+        en: "Ask 'Which door would the OTHER guard call safe?' then pick the other door",
+        kz: "«Екінші күзетші қай есікті қауіпсіз дер еді?» деп сұрап, басқа есікті таңдаңыз",
+      },
+      { en: "Ask 'Is the left door safe?'", kz: "«Сол жақ есік қауіпсіз бе?» деп сұраңыз" },
+      { en: "Ask 'Which door is safe?'", kz: "«Қай есік қауіпсіз?» деп сұраңыз" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "'If it rains, the match is cancelled. The match was cancelled. Therefore it rained.' This argument is:",
+      kz: "«Егер жаңбыр жауса, матч болмай қалады. Матч болмай қалды. Демек, жаңбыр жауды.» Бұл пайымдау:",
+    },
+    choices: [
+      { en: "Valid", kz: "Дұрыс (валид)" },
+      {
+        en: "Invalid — the match could be cancelled for other reasons",
+        kz: "Қате — матч басқа себептермен де болмай қалуы мүмкін",
+      },
+      { en: "True by definition", kz: "Анықтама бойынша ақиқат" },
+      { en: "Impossible to judge", kz: "Бағалау мүмкін емес" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "Sara is looking at John. John is looking at Mary. Sara is married; Mary is not. We don't know if John is married. Is a married person looking at an unmarried person?",
+      kz: "Сара Джонға қарап тұр. Джон Мэриге қарап тұр. Сара — үйленген; Мэри — үйленбеген. Джон туралы белгісіз. Үйленген адам үйленбеген адамға қарап тұр ма?",
+    },
+    choices: [
+      { en: "Yes", kz: "Иә" },
+      { en: "No", kz: "Жоқ" },
+      { en: "Not enough information", kz: "Ақпарат жеткіліксіз" },
+      { en: "Only if John is married", kz: "Тек Джон үйленген болса" },
+    ],
+    correctIndex: 0,
+  },
+  {
+    prompt: {
+      en: "A bag holds 2 red and 2 blue balls. You draw two at once without looking. What is the probability both are the same color?",
+      kz: "Қапта 2 қызыл және 2 көк шар бар. Қарамай бірден екеуін аласыз. Екеуінің түсі бірдей болу ықтималдығы қанша?",
+    },
+    choices: [
+      { en: "1/2", kz: "1/2" },
+      { en: "1/3", kz: "1/3" },
+      { en: "1/4", kz: "1/4" },
+      { en: "2/3", kz: "2/3" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "In a running race, if you overtake the person in last place, what position are you then in?",
+      kz: "Жүгіру жарысында ең соңғы орындағы адамды басып озсаңыз, сіз қай орында боласыз?",
+    },
+    choices: [
+      { en: "Last", kz: "Соңғы" },
+      { en: "Second to last", kz: "Соңынан екінші" },
+      {
+        en: "You can't overtake the last-place person",
+        kz: "Ең соңғы адамды басып озу мүмкін емес",
+      },
+      { en: "First", kz: "Бірінші" },
+    ],
+    correctIndex: 2,
+  },
+  {
+    prompt: {
+      en: "A man is found hanging in a sealed, empty, locked room with a puddle of water beneath him and no furniture. How did he do it?",
+      kz: "Бір ер адам жабық, бос, кілттелген бөлмеде асылып тұрған күйде табылды; астында су көлшігі бар, жиһаз жоқ. Ол мұны қалай істеді?",
+    },
+    choices: [
+      { en: "He climbed the walls", kz: "Қабырғаға өрмелеп шықты" },
+      {
+        en: "He stood on a large block of ice that then melted",
+        kz: "Ірі мұз кесегінің үстіне тұрды, ол кейін еріп кетті",
+      },
+      { en: "Someone helped him", kz: "Біреу көмектесті" },
+      { en: "There was a hidden ladder", kz: "Жасырын саты болған" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "A company reports '90% of customers are satisfied,' but only 10% of customers chose to return the survey. The biggest flaw in this claim is:",
+      kz: "Бір компания «тұтынушылардың 90%-ы риза» дейді, бірақ сауалнаманы тұтынушылардың тек 10%-ы қайтарған. Бұл тұжырымдағы ең басты қате:",
+    },
+    choices: [
+      { en: "The sample is too small", kz: "Таңдама тым кішкентай" },
+      {
+        en: "Self-selection bias — unhappy customers may not respond",
+        kz: "Өзін-өзі іріктеу ауытқуы — ренжігендер жауап бермеуі мүмкін",
+      },
+      { en: "90% is not a majority", kz: "90% — көпшілік емес" },
+      { en: "There is no flaw", kz: "Ешқандай қате жоқ" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "All cats are mammals. No mammals are reptiles. Which conclusion is logically valid?",
+      kz: "Барлық мысықтар — сүтқоректілер. Бірде-бір сүтқоректі бауырымен жорғалаушы емес. Қай қорытынды дұрыс?",
+    },
+    choices: [
+      { en: "Some cats are reptiles", kz: "Кейбір мысықтар — бауырымен жорғалаушы" },
+      { en: "No cats are reptiles", kz: "Бірде-бір мысық бауырымен жорғалаушы емес" },
+      { en: "All mammals are cats", kz: "Барлық сүтқоректілер — мысық" },
+      { en: "Some reptiles are cats", kz: "Кейбір бауырымен жорғалаушылар — мысық" },
+    ],
+    correctIndex: 1,
+  },
+  {
+    prompt: {
+      en: "Ice-cream sales and drowning deaths rise and fall together over the year. What is the best explanation?",
+      kz: "Балмұздақ сатылымы мен суға кету оқиғалары жыл бойы бірге өсіп, бірге азаяды. Ең дұрыс түсіндірме қандай?",
+    },
+    choices: [
+      { en: "Ice cream causes drowning", kz: "Балмұздақ суға кетуге себеп болады" },
+      {
+        en: "Drowning drives ice-cream sales",
+        kz: "Суға кету балмұздақ сатылымын арттырады",
+      },
+      {
+        en: "A third factor — hot weather — drives both",
+        kz: "Үшінші фактор — ыстық ауа райы — екеуіне де әсер етеді",
+      },
+      { en: "It is pure coincidence", kz: "Бұл — таза кездейсоқтық" },
+    ],
+    correctIndex: 2,
+  },
+];
+
 export const BANKS: Record<Difficulty, RawQuestion[]> = {
   easy: EASY_BANK,
+  medium: MEDIUM_BANK,
   hard: HARD_BANK,
 };
 
 export const DEFAULT_TIME_LIMIT: Record<Difficulty, number> = {
   easy: EASY_TIME_LIMIT,
+  medium: MEDIUM_TIME_LIMIT,
   hard: HARD_TIME_LIMIT,
 };
 

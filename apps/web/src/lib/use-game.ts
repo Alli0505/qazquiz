@@ -71,7 +71,7 @@ export function useGameSocket() {
   }, [store]);
 
   const host = useCallback(
-    (hostName: string, difficulty: "easy" | "hard" = "easy") =>
+    (hostName: string, difficulty: "easy" | "medium" | "hard" = "easy") =>
       new Promise<string>((resolve) => {
         sfx.resume(); // unlock audio on this user gesture
         const socket = getSocket();

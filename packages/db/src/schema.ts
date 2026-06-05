@@ -14,7 +14,7 @@ import {
 
 type LocalizedString = Record<string, string>;
 
-export const difficultyEnum = pgEnum("difficulty", ["easy", "hard"]);
+export const difficultyEnum = pgEnum("difficulty", ["easy", "medium", "hard"]);
 
 // ── Auth (Better Auth core tables) ────────────────────────────────────
 // Better Auth manages migrations for these, but we declare them so app

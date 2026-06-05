@@ -1,1 +1,0 @@
-ALTER TABLE "questions" ALTER COLUMN "points" SET DEFAULT 100;
