@@ -175,8 +175,9 @@ io.on("connection", (socket) => {
     const q = ctx.questions[ctx.currentIndex];
     if (!q || q.id !== questionId || ctx.answers.has(socket.id)) return;
 
-    game.actor.send({ type: "ANSWER", playerId: socket.id, choiceIndex });
-
+    // Apply the score BEFORE sending ANSWER: when this is the last player,
+    // ANSWER synchronously transitions to answerReveal and broadcasts the
+    // leaderboard, so the points must already be reflected.
     if (choiceIndex === q.correctIndex && ctx.questionStartedAt) {
       const answeredAt = Math.max(clientTs, ctx.questionStartedAt);
       const gained = computeScore(q, answeredAt, ctx.questionStartedAt);
@@ -184,6 +185,8 @@ io.on("connection", (socket) => {
       const player: Player | undefined = ctx.players.get(socket.id);
       if (player) player.score = total;
     }
+
+    game.actor.send({ type: "ANSWER", playerId: socket.id, choiceIndex });
   });
 
   socket.on("lobby:leave", () => {

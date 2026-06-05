@@ -55,8 +55,16 @@ export const gameMachine = setup({
   guards: {
     hasMoreQuestions: ({ context }) =>
       context.currentIndex < context.questions.length - 1,
-    allAnswered: ({ context }) =>
-      context.answers.size >= context.players.size && context.players.size > 0,
+    // Guards run BEFORE recordAnswer, so include the player from this very
+    // ANSWER event — otherwise the last answer never trips the transition.
+    allAnswered: ({ context, event }) => {
+      if (context.players.size === 0) return false;
+      const willHave =
+        event.type === "ANSWER" && !context.answers.has(event.playerId)
+          ? context.answers.size + 1
+          : context.answers.size;
+      return willHave >= context.players.size;
+    },
   },
   delays: {
     countdown: COUNTDOWN_MS,

@@ -578,7 +578,7 @@ export function demoQuestions(
       id: randomUUID(),
       quizId: QUIZ_ID,
       timeLimit: q.timeLimit ?? DEFAULT_TIME_LIMIT[difficulty],
-      points: q.points ?? 1000,
+      points: q.points ?? 100,
     }));
 }
 

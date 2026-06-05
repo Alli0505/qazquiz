@@ -28,7 +28,7 @@ async function seed() {
       choices: q.choices,
       correctIndex: q.correctIndex,
       timeLimit: q.timeLimit ?? DEFAULT_TIME_LIMIT[difficulty],
-      points: q.points ?? 1000,
+      points: q.points ?? 100,
     })),
   );
 

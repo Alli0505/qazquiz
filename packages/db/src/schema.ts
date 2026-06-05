@@ -63,7 +63,7 @@ export const questions = pgTable(
     /** optional localized "why this answer is correct" */
     explanation: jsonb("explanation").$type<LocalizedString>(),
     timeLimit: integer("time_limit").default(15).notNull(),
-    points: integer("points").default(1000).notNull(),
+    points: integer("points").default(100).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },

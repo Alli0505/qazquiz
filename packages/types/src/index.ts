@@ -29,7 +29,7 @@ export const questionSchema = z.object({
   /** seconds the question stays open */
   timeLimit: z.number().int().positive().default(20),
   /** max points awarded for an instant correct answer */
-  points: z.number().int().positive().default(1000),
+  points: z.number().int().positive().default(100),
 });
 export type Question = z.infer<typeof questionSchema>;
 
