@@ -1,5 +1,5 @@
 {
-  "id": "05475d2b-1700-4200-b048-200dcb835827",
+  "id": "b810bcb5-2476-4f15-ac13-3eb6b9883e1a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -266,6 +266,12 @@
           "type": "smallint",
           "primaryKey": false,
           "notNull": true
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "explanation": {
           "name": "explanation",

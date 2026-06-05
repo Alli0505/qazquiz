@@ -33,6 +33,7 @@ async function seed() {
       prompt: q.prompt,
       choices: q.choices,
       correctIndex: q.correctIndex,
+      icon: q.icon ?? null,
       timeLimit: q.timeLimit ?? DEFAULT_TIME_LIMIT[difficulty],
       points: q.points ?? 100,
     })),

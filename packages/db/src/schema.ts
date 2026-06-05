@@ -60,6 +60,8 @@ export const questions = pgTable(
     prompt: jsonb("prompt").$type<LocalizedString>().notNull(),
     choices: jsonb("choices").$type<LocalizedString[]>().notNull(),
     correctIndex: smallint("correct_index").notNull(),
+    /** decorative emoji/glyph hero shown with the question */
+    icon: text("icon"),
     /** optional localized "why this answer is correct" */
     explanation: jsonb("explanation").$type<LocalizedString>(),
     timeLimit: integer("time_limit").default(15).notNull(),

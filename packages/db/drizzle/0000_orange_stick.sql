@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS "questions" (
 	"prompt" jsonb NOT NULL,
 	"choices" jsonb NOT NULL,
 	"correct_index" smallint NOT NULL,
+	"icon" text,
 	"explanation" jsonb,
 	"time_limit" integer DEFAULT 15 NOT NULL,
 	"points" integer DEFAULT 100 NOT NULL,

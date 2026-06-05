@@ -27,9 +27,10 @@ export interface RawQuestion {
   correctIndex: number;
   timeLimit?: number;
   points?: number;
+  icon?: string;
 }
 
-export const EASY_BANK: RawQuestion[] = [
+const EASY_BANK_RAW: RawQuestion[] = [
   // ── General knowledge ──────────────────────────────────────────────
   {
     prompt: {
@@ -284,7 +285,7 @@ export const EASY_BANK: RawQuestion[] = [
 ];
 
 // ── MEDIUM: tough logical & abstract puzzles (1 minute each) ──────────
-export const MEDIUM_BANK: RawQuestion[] = [
+const MEDIUM_BANK_RAW: RawQuestion[] = [
   {
     prompt: {
       en: "What comes next: 1, 11, 21, 1211, 111221, ?",
@@ -548,7 +549,7 @@ export const MEDIUM_BANK: RawQuestion[] = [
 ];
 
 // ── HARD: story-based critical-thinking puzzles (5 minutes each) ──────
-export const HARD_BANK: RawQuestion[] = [
+const HARD_BANK_RAW: RawQuestion[] = [
   {
     prompt: {
       en: "On an island, knights always tell the truth and knaves always lie. You meet A and B. A says: 'We are both knaves.' What are A and B?",
@@ -853,6 +854,41 @@ export const HARD_BANK: RawQuestion[] = [
   },
 ];
 
+// Per-question hero emojis, index-aligned to each bank above.
+const EASY_ICONS = [
+  "🏙️", "🌐", "🌍", "🖥️", "🪐", "🌊", "🔷", "🌱", // general knowledge
+  "🔢", "🔢", "🤔", "⚖️", "⚾", "📅", "📆", "➗", "⚖️", "🗓️", "🐑", // logic
+];
+const MEDIUM_ICONS = [
+  "🔢", "🔢", "🐱", "🕒", "🧩", "🧮", "🐻", "🚪", "🔢", "🐌",
+  "🔢", "🚆", "🔢", "🏃", "➖", "🎲", "💰", "🔢", "🔢", "👨‍👧",
+];
+const HARD_ICONS = [
+  "🛡️", "📦", "🧪", "💡", "🎂", "🎩", "⚖️", "🎣", "🧑‍🏫", "📷",
+  "🪙", "🚪", "🌧️", "💍", "🎱", "🏁", "🧊", "📊", "🐱", "🍦",
+];
+
+const FALLBACK_ICON: Record<Difficulty, string> = {
+  easy: "❓",
+  medium: "🧩",
+  hard: "🧠",
+};
+
+function withIcons(
+  raw: RawQuestion[],
+  icons: string[],
+  difficulty: Difficulty,
+): RawQuestion[] {
+  return raw.map((q, i) => ({
+    ...q,
+    icon: q.icon ?? icons[i] ?? FALLBACK_ICON[difficulty],
+  }));
+}
+
+export const EASY_BANK = withIcons(EASY_BANK_RAW, EASY_ICONS, "easy");
+export const MEDIUM_BANK = withIcons(MEDIUM_BANK_RAW, MEDIUM_ICONS, "medium");
+export const HARD_BANK = withIcons(HARD_BANK_RAW, HARD_ICONS, "hard");
+
 export const BANKS: Record<Difficulty, RawQuestion[]> = {
   easy: EASY_BANK,
   medium: MEDIUM_BANK,
@@ -924,6 +960,7 @@ export async function loadQuestions(
         correctIndex: r.correctIndex,
         timeLimit: r.timeLimit,
         points: r.points,
+        icon: r.icon ?? undefined,
       }));
     }
     console.warn(

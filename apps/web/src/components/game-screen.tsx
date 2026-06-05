@@ -165,6 +165,18 @@ function QuestionView({ actions }: { actions: ReturnType<typeof useGameSocket> }
           </span>
         </div>
 
+        {question.icon && (
+          <motion.div
+            key={question.id}
+            initial={{ scale: 0.5, opacity: 0, rotate: -8 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
+            className="mx-auto flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500/25 via-fuchsia-500/20 to-amber-400/25 text-6xl shadow-xl ring-1 ring-white/40 backdrop-blur-sm dark:ring-white/10"
+          >
+            <span className="drop-shadow-sm">{question.icon}</span>
+          </motion.div>
+        )}
+
         <h2 className="text-center text-3xl font-bold">
           {lx(question.prompt)}
         </h2>

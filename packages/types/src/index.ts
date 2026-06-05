@@ -30,6 +30,8 @@ export const questionSchema = z.object({
   timeLimit: z.number().int().positive().default(20),
   /** max points awarded for an instant correct answer */
   points: z.number().int().positive().default(100),
+  /** decorative emoji/glyph shown as the question's hero image */
+  icon: z.string().optional(),
 });
 export type Question = z.infer<typeof questionSchema>;
 
