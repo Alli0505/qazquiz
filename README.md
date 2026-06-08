@@ -94,6 +94,35 @@ The driver is `postgres.js` (standard TCP), which works against local Postgres
 **and** Neon (use Neon's *pooled* connection string in production — see
 `.env.example`).
 
+## Questions API — Kotlin / Spring Boot (`apps/api`)
+
+The question bank is served by a JVM backend (Kotlin + Spring Boot 3 + jOOQ),
+introduced via the strangler-fig pattern — domain services move to Kotlin one
+at a time; the Node real-time engine and Next.js web stay as they are.
+
+```
+socket-server ──HTTP──▶ Kotlin API (:8080) ──SQL──▶ Postgres
+   (falls back to the in-memory bank if the API is down)
+```
+
+- **Endpoint:** `GET /api/v1/questions/random?difficulty=easy|medium|hard&count=10`
+  → a random set of questions **with answers** (server-to-server; the web
+  client never sees `correctIndex`). Swagger UI at `/swagger`, health at
+  `/actuator/health`.
+- **Schema ownership:** Drizzle (Node) still owns the schema + seed; the API
+  is read-only on `questions` for now (no dual-migration conflict).
+- **Stack:** Java 21 LTS, Gradle (wrapper), jOOQ (SQL-first), HikariCP,
+  Actuator, JUnit5.
+
+Run it (needs JDK 21 — `brew install openjdk@21`):
+
+```bash
+cd apps/api && ./gradlew bootRun        # http://localhost:8080
+# the socket server calls it via QUESTIONS_API_URL (default http://localhost:8080)
+```
+
+Or via Docker: `docker compose up -d api` (builds the multi-stage image).
+
 ## Going to production (Neon + Redis)
 
 ```bash

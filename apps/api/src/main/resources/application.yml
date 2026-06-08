@@ -1,0 +1,27 @@
+server:
+  port: ${API_PORT:8080}
+
+spring:
+  application:
+    name: qazquiz-api
+  datasource:
+    # Local dev points at the same Docker Postgres the Node side uses.
+    # In prod, override SPRING_DATASOURCE_URL with the Neon JDBC URL.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/qazquiz}
+    username: ${DB_USER:qazquiz}
+    password: ${DB_PASSWORD:qazquiz}
+    hikari:
+      maximum-pool-size: 10
+      pool-name: qazquiz-pool
+  jooq:
+    sql-dialect: postgres
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

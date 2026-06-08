@@ -17,5 +17,21 @@ services:
       timeout: 5s
       retries: 10
 
+  # Kotlin questions API (Spring Boot). Optional locally — you can also run
+  # it with `./gradlew bootRun` from apps/api during development.
+  api:
+    build: ./apps/api
+    container_name: qazquiz-api
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/qazquiz
+      DB_USER: qazquiz
+      DB_PASSWORD: qazquiz
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   qazquiz-pgdata:

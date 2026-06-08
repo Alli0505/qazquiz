@@ -1,8 +1,21 @@
 import { randomUUID } from "node:crypto";
 
-import { db, questions as questionsTable } from "@qazquiz/db";
 import type { Difficulty, LocalizedString, Question } from "@qazquiz/types";
-import { and, eq, isNull, sql } from "drizzle-orm";
+
+/** Kotlin questions API (Spring Boot). Override in prod. */
+const QUESTIONS_API_URL =
+  process.env.QUESTIONS_API_URL ?? "http://localhost:8080";
+
+interface ApiQuestion {
+  id: string;
+  difficulty: string;
+  prompt: LocalizedString;
+  choices: LocalizedString[];
+  correctIndex: number;
+  icon: string | null;
+  timeLimit: number;
+  points: number;
+}
 
 /**
  * MVP demo quiz banks. In production these come from Postgres (the
@@ -929,46 +942,43 @@ export function demoQuestions(
 }
 
 /**
- * Load a random set of questions for a game. Prefers Postgres (the bank
- * questions for the chosen difficulty); falls back to the in-memory bank
- * if the DB is unreachable or hasn't been seeded yet.
+ * Load a random set of questions for a game from the Kotlin questions API.
+ * Falls back to the in-memory bank if the API is unreachable or empty, so
+ * the game keeps working even when the backend is down.
  */
 export async function loadQuestions(
   difficulty: Difficulty = "easy",
   count = QUESTIONS_PER_GAME,
 ): Promise<Question[]> {
   try {
-    const rows = await db
-      .select()
-      .from(questionsTable)
-      .where(
-        and(
-          eq(questionsTable.difficulty, difficulty),
-          eq(questionsTable.isActive, true),
-          isNull(questionsTable.quizId),
-        ),
-      )
-      .orderBy(sql`random()`)
-      .limit(count);
+    const url = `${QUESTIONS_API_URL}/api/v1/questions/random?difficulty=${difficulty}&count=${count}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
 
-    if (rows.length > 0) {
-      return rows.map((r) => ({
-        id: r.id,
-        quizId: r.quizId ?? QUIZ_ID,
-        prompt: r.prompt,
-        choices: r.choices,
-        correctIndex: r.correctIndex,
-        timeLimit: r.timeLimit,
-        points: r.points,
-        icon: r.icon ?? undefined,
-      }));
+    if (res.ok) {
+      const data = (await res.json()) as ApiQuestion[];
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((q) => ({
+          id: q.id,
+          quizId: QUIZ_ID,
+          prompt: q.prompt,
+          choices: q.choices,
+          correctIndex: q.correctIndex,
+          timeLimit: q.timeLimit,
+          points: q.points,
+          icon: q.icon ?? undefined,
+        }));
+      }
+      console.warn(
+        `[questions] API returned no ${difficulty} questions — using in-memory fallback`,
+      );
+    } else {
+      console.warn(
+        `[questions] API responded ${res.status} — using in-memory fallback`,
+      );
     }
-    console.warn(
-      `[questions] DB has no ${difficulty} bank questions — using in-memory fallback`,
-    );
   } catch (err) {
     console.warn(
-      `[questions] DB load failed (${(err as Error).message}) — using in-memory fallback`,
+      `[questions] API unreachable (${(err as Error).message}) — using in-memory fallback`,
     );
   }
   return demoQuestions(difficulty, count);

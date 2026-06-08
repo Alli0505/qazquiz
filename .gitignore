@@ -9,6 +9,11 @@ out/
 .turbo/
 *.tsbuildinfo
 
+# jvm / gradle (apps/api)
+apps/api/.gradle/
+apps/api/build/
+.kotlin/
+
 # env
 .env
 .env.*
