@@ -129,8 +129,20 @@ io.on("connection", (socket) => {
   let joinedCode: string | null = null;
 
   socket.on("host:create", async ({ hostName, difficulty }, ack) => {
+    let questions;
+    try {
+      questions = await loadQuestions(difficulty);
+    } catch (err) {
+      console.error("[host:create] failed to load questions:", err);
+      socket.emit("error", {
+        code: "QUESTIONS_UNAVAILABLE",
+        message: "Could not load questions — is the backend API running?",
+      });
+      ack({ gameCode: "" });
+      return;
+    }
     const code = makeCode();
-    const actor = createGame(code, socket.id, await loadQuestions(difficulty));
+    const actor = createGame(code, socket.id, questions);
     joinedCode = code;
     await socket.join(code);
     actor.send({

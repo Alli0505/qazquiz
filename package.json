@@ -12,10 +12,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "db:generate": "pnpm --filter @qazquiz/db db:generate",
-    "db:migrate": "pnpm --filter @qazquiz/db db:migrate",
-    "db:studio": "pnpm --filter @qazquiz/db db:studio"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "prettier": "^3.3.3",

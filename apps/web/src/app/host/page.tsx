@@ -16,6 +16,7 @@ export default function HostPage() {
   const [name, setName] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (gameCode) return <GameScreen actions={actions} />;
 
@@ -46,7 +47,10 @@ export default function HostPage() {
           e.preventDefault();
           if (!name.trim()) return;
           setBusy(true);
-          await actions.host(name.trim(), difficulty);
+          setError(null);
+          const code = await actions.host(name.trim(), difficulty);
+          setBusy(false);
+          if (!code) setError(m.host.error);
         }}
       >
         <input
@@ -86,6 +90,11 @@ export default function HostPage() {
         <Button type="submit" className="w-full" disabled={busy || !name.trim()}>
           {busy ? m.host.creating : m.host.create}
         </Button>
+        {error && (
+          <p className="text-center text-sm font-semibold text-rose-500">
+            {error}
+          </p>
+        )}
       </form>
       <p className="text-center text-sm font-medium text-zinc-700 [text-shadow:0_1px_8px_rgba(255,255,255,0.6)] dark:text-zinc-200 dark:[text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
         {difficultyHint}

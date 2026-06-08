@@ -1,9 +1,7 @@
-import { db } from "@qazquiz/db";
-
 /**
- * Per-request context. `createContext` is wired up by each adapter
- * (Next.js route handler, fetch handler, etc.) and passes the resolved
- * session through. Keep this adapter-agnostic.
+ * Per-request context. The database now lives behind the Kotlin backend —
+ * tRPC no longer holds a DB client. Add a typed API client here if/when the
+ * web app needs to call the backend through tRPC.
  */
 export interface Session {
   userId: string;
@@ -17,7 +15,6 @@ export interface CreateContextOptions {
 
 export function createTRPCContext(opts: CreateContextOptions) {
   return {
-    db,
     session: opts.session,
     headers: opts.headers,
   };

@@ -77,9 +77,12 @@ export function useGameSocket() {
         const socket = getSocket();
         if (!socket.connected) socket.connect();
         socket.emit("host:create", { hostName, difficulty }, ({ gameCode }) => {
-          useGameStore
-            .getState()
-            .enter({ gameCode, myId: socket.id ?? "", isHost: true });
+          // empty code = backend couldn't load questions (see "error" event)
+          if (gameCode) {
+            useGameStore
+              .getState()
+              .enter({ gameCode, myId: socket.id ?? "", isHost: true });
+          }
           resolve(gameCode);
         });
       }),

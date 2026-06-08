@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   reactStrictMode: true,
   // Workspace packages ship TS source; let Next transpile them.
-  transpilePackages: ["@qazquiz/ui", "@qazquiz/trpc", "@qazquiz/types", "@qazquiz/db"],
+  transpilePackages: ["@qazquiz/ui", "@qazquiz/trpc", "@qazquiz/types"],
   experimental: {
     typedRoutes: true,
   },

@@ -15,6 +15,9 @@ spring:
       pool-name: qazquiz-pool
   jooq:
     sql-dialect: postgres
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
 springdoc:
   swagger-ui:
